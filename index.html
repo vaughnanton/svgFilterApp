@@ -1,0 +1,111 @@
+<!doctype HTML>
+<html>
+  <head>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+  </head>
+
+  <body>
+    <div class="form">
+      <form id="color-form">
+        <input type="text" id="duo1" name="duo1" placeholder="Enter First Hex Code">
+        <input type="text" id="duo2" name="duo2" placeholder="Enter Second Hex Code">
+        <input id="update" type="button" value="Update Colors!">
+        <input id="filter" type="button" value="Toggle Filter!">
+      </form>
+    </div>
+
+    <div id="main" class='image-body'>
+        <svg xmlns="http://www.w3.org/2000/svg">
+          <filter id="duotone_it">
+            <!--set image to grayscale-->
+            <feColorMatrix type='matrix' result='grayscale'
+              values='1 0 0 0 0
+              1 0 0 0 0
+              1 0 0 0 0
+              0 0 0 1 0'>
+            </feColorMatrix>
+
+              <!-- values here are calculated by dividing two RGB values by 255 ex. 145/255
+                  first column is one color, second column is second color -->
+            <feComponentTransfer color-interpolation-filters="sRGB" result="duotone">
+              <feFuncR id="funcR" type="table" tableValues="0.15 .88"></feFuncR>
+              <feFuncG id="funcG" type="table" tableValues="0.1 0.1"></feFuncG>
+              <feFuncB id="funcB" type="table" tableValues="0.15 0.1"></feFuncB>
+              <feFuncA type="table" tableValues="0 1"></feFuncA>
+            </feComponentTransfer>
+          </filter>
+        </svg>
+    </div>
+  </body>
+
+  <script>
+
+    //query url params, create result object with r g b values, update filter rgb filter tableValues
+    //example url .com/index.html?duo1=e74ea1&duo2=f7af49
+    window.addEventListener("load", function(){
+      var urlParams = new URLSearchParams(window.location.search);
+
+      var duo1 = urlParams.get('duo1');
+      console.log(urlParams.get('duo1'));
+
+      var duo2 = urlParams.get('duo2');
+      console.log(urlParams.get('duo2'));
+
+      function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16) / 255,
+          g: parseInt(result[2], 16) / 255,
+          b: parseInt(result[3], 16) / 255
+        } :null;
+      }
+
+      var r1 = hexToRgb(duo1).r;
+      var g1 = hexToRgb(duo1).g;
+      var b1 = hexToRgb(duo1).b;
+      var r2 = hexToRgb(duo2).r;
+      var g2 = hexToRgb(duo2).g;
+      var b2 = hexToRgb(duo2).b;
+
+      console.log(r1,r2);
+      console.log(g1,g2);
+      console.log(b1,b2);
+
+      const funcR = document.querySelector('#funcR');
+      const funcG = document.querySelector('#funcG');
+      const funcB = document.querySelector('#funcB');
+
+      funcR.setAttribute("tableValues", r1 + " " + r2);
+      funcG.setAttribute("tableValues", g1 + " " + g2);
+      funcB.setAttribute("tableValues", b1 + " " + b2);
+    });
+
+    //add or remove the filter
+    const element = document.querySelector('.image-body');
+    const button1 = document.querySelector('#update');
+    const button2 = document.querySelector('#filter');
+    var siono = 0;
+
+    button1.addEventListener("click", function(){
+      var duo1 = document.querySelector('#duo1').value;
+      var duo2 = document.querySelector('#duo2').value;
+      console.log(duo2);
+      console.log(duo1);
+      window.location.replace("http://image.cecash.com/vaughn/svgFilter/index.html?duo1=" + duo1 + "&duo2=" + duo2);
+      console.log("http://image.cecash.com/vaughn/svgFilter/index.html?duo1=" + duo1 + "&duo2=" + duo2);
+    });
+
+    button2.addEventListener("click", function(){
+      if (siono == 1) {
+        element.classList.remove('filter');
+        siono--;
+      } else {
+        element.classList.add('filter');
+        siono++;
+      }
+    });
+
+
+   </script>
+
+</html>
